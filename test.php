@@ -1,5 +1,5 @@
 <?php
-
+/*
 $host = 'localhost';
 $db   = 'cadastro';
 $user = 'root';
@@ -18,3 +18,16 @@ $resultado = $stmt->fetchAll(PDO::FETCH_ASSOC);
 foreach($resultado as $pessoas){
     echo "{$pessoas['id']} -> {$pessoas['nome']}<br>";
 }
+*/
+
+$valorTeste = '     Olá Mundo        ';
+
+if(trim($valorTeste) != ''){
+    echo "<p>deu certo a validação </p>";
+}
+
+else{
+    echo "<p>Nada</p>";
+}
+
+echo trim($valorTeste);
