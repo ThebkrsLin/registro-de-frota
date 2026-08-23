@@ -40,20 +40,21 @@ class Motorista{
     }
 
     private function validarCpf(string $cpf): string{
-        if($cpf === ''){
-            throw new Exception("O dado digitado está inválido!!!");
+        $cpf = trim($cpf);
+
+        if (preg_match('/^\d{11}$/', $cpf)) {
+            return preg_replace(
+                '/(\d{3})(\d{3})(\d{3})(\d{2})/',
+                '$1.$2.$3-$4',
+                $cpf
+            );
         }
 
-        if(mb_strlen($cpf) == 11){
-            $cpf_formatado = preg_replace("/(\d{3})(\d{3})(\d{3})(\d{2})/", "$1.$2.$3-$4", $cpf);
-            return $cpf_formatado;
-        }
-
-        if(mb_strlen($cpf) == 14 && preg_replace("/(\d{3})(\d{3})(\d{3})(\d{2})/", "$1.$2.$3-$4", $cpf)){
+        if (preg_match('/^\d{3}\.\d{3}\.\d{3}-\d{2}$/', $cpf)) {
             return $cpf;
         }
 
-        throw new Exception("O cpf digitado é inválido!!");
+        throw new Exception("O CPF digitado é inválido!!");
         
     }
 

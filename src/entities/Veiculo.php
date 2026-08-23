@@ -11,31 +11,24 @@ class Veiculo{
     private ?string $updated_at;
     private ?int $motorista_id;
 
-    public function __construct(string $placa, string $mod, string $marca, int $ano){
+    public function __construct(string $placa, string $mod, string $marca, int $ano, ?int $mid){
         $this->placa = $this->validar($placa);
         $this->modelo = $this->validar($mod);
         $this->marca = $this->validar($marca);
         $this->ano = $this->validarAno($ano);
-        $this->id = null;
         $this->created_at = date("Y-m-d H:i:ss");
+        $this->motorista_id = $mid;
+        $this->id = null;
         $this->ativo = true;
         $this->updated_at = null;
-        $this->motorista_id = null;
     }
 
     public static function reconstruirVeiculo(int $id, string $placa, string $mod, string $marca, int $ano,  string $data, ?string $up, bool $at, ?int $mid): Veiculo{
-        $carro = new Veiculo($placa, $mod, $marca, $ano);
+        $carro = new Veiculo($placa, $mod, $marca, $ano, $mid);
         $carro->id = $id;
         $carro->created_at = $data;
         $carro->ativo = $at;
-
-        if($up !== null){
-            $carro->updated_at = $up;
-        }
-
-        if($mid !== null){
-            $carro->motorista_id = $mid;
-        }
+        $carro->updated_at = $up;
         
         return $carro;
     }
@@ -102,10 +95,9 @@ class Veiculo{
     public function inativar(): void{
         if($this->ativo){
             $this->ativo = false;
+            $this->registrarAtualizacao();
         }
 
-        $this->registrarAtualizacao();
-        // seria interessante fazer o index disabilitar a opção se caso o veiculo reconstruido estiver desativo?
     }
 
     /**
