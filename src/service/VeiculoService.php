@@ -84,7 +84,7 @@ class VeiculoService{
             throw new Exception("Veiculo não encontrado!!!");
         }
 
-        $veiculo->atualizarPlaca($v);
+        $veiculo->atualizarModelo($v);
         $this->vRepo->atualizarVeiculo($veiculo);
     }
 
@@ -94,7 +94,7 @@ class VeiculoService{
             throw new Exception("Veiculo não encontrado!!!");
         }
 
-        $veiculo->atualizarPlaca($v);
+        $veiculo->atualizarMarca($v);
         $this->vRepo->atualizarVeiculo($veiculo);
     }
 
@@ -104,7 +104,7 @@ class VeiculoService{
             throw new Exception("Veiculo não encontrado!!!");
         }
 
-        $veiculo->atualizarPlaca($v);
+        $veiculo->atualizarAno($v);
         $this->vRepo->atualizarVeiculo($veiculo);
     }
 
