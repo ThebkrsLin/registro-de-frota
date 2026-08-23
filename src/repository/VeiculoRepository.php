@@ -42,30 +42,6 @@ class VeiculoRepository{
         return $veiculo;
     }
 
-    public function associarMotorista(int $id, int $motorid): void{
-        $veiculo = $this->buscarId($id);
-
-        if($veiculo === null){
-            throw new Exception("Veiculo não foi encontrado");
-        }
-
-        if($veiculo->getMotoristaId() == $motorid){
-            return;
-        }
-
-        $veiculo->associarMotorista($motorid);
-
-        $atualizar = "UPDATE veiculos 
-        SET motorista_id = :motorista_id, updated_at = :updated_at
-        WHERE id = :id";
-        $stmt = $this->pdo->prepare($atualizar);
-        $stmt->execute([
-            "id" => $veiculo->getId(),
-            "motorista_id" => $veiculo->getMotoristaId(),
-            "updated_at" => $veiculo->getUpdatedAt()
-        ]);
-    }
-
     public function listarVeiculos(): array{
         $listar = "SELECT * FROM veiculos";
         $stmt = $this->pdo->prepare($listar);
@@ -85,17 +61,19 @@ class VeiculoRepository{
     public function atualizarVeiculo(Veiculo $veiculo): void{
         $atualizar= "UPDATE veiculos
         SET placa = :placa, modelo = :modelo, 
-        marca = :marca, ano = :ano, updated_at = :updated_at, ativo = :ativo
+        marca = :marca, ano = :ano, ativo = :ativo, 
+        updated_at = :updated_at, motorista_id = :motorista_id
         WHERE id = :id";
         $stmt = $this->pdo->prepare($atualizar);
         $stmt->execute([
-            "id"         => $veiculo->getId() ,
-            "placa"      => $veiculo->getPlaca(),
-            "marca"      => $veiculo->getMarca(),
-            "modelo"     => $veiculo->getModelo(),
-            "ano"        => $veiculo->getAno(),
-            "ativo"      => $veiculo->getAtivo(),
-            "updated_at" => $veiculo->getUpdatedAt()
+            "id"           => $veiculo->getId() ,
+            "placa"        => $veiculo->getPlaca(),
+            "marca"        => $veiculo->getMarca(),
+            "modelo"       => $veiculo->getModelo(),
+            "ano"          => $veiculo->getAno(),
+            "ativo"        => $veiculo->getAtivo(),
+            "updated_at"   => $veiculo->getUpdatedAt(),
+            "motorista_id" => $veiculo->getMotoristaId()
         ]);
     }
 }
