@@ -85,7 +85,7 @@ class VeiculoRepository{
     public function atualizarVeiculo(Veiculo $veiculo): void{
         $atualizar= "UPDATE veiculos
         SET placa = :placa, modelo = :modelo, 
-        marca = :marca, ano = :ano, updated_at = :updated_atAWz
+        marca = :marca, ano = :ano, updated_at = :updated_at, ativo = :ativo
         WHERE id = :id";
         $stmt = $this->pdo->prepare($atualizar);
         $stmt->execute([
@@ -94,27 +94,8 @@ class VeiculoRepository{
             "marca"      => $veiculo->getMarca(),
             "modelo"     => $veiculo->getModelo(),
             "ano"        => $veiculo->getAno(),
+            "ativo"      => $veiculo->getAtivo(),
             "updated_at" => $veiculo->getUpdatedAt()
         ]);
     }
-
-    public function inativarVeiculo(int $id): void{
-        $veiculo = $this->buscarId($id);
-
-        if($veiculo === null){
-            throw new Exception("Veiculo não encontrado!!");
-        }
-
-        $veiculo->inativar();
-        $atualizar = "UPDATE veiculos
-        SET ativo = :ativo, updated_at = :updated_at
-        WHERE id = :id";
-        $stmt = $this->pdo->prepare($atualizar);
-        $stmt->execute([
-            "id" => $veiculo->getId(),
-            "ativo" => $veiculo->getAtivo(),
-            "updated_at" => $veiculo->getUpdatedAt()
-        ]);
-    }
-
 }

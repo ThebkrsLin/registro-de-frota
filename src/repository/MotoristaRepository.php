@@ -70,43 +70,20 @@ class MotoristaRepository{
         return $motoristas;
     }
 
-    public function atualizarMotorista(int $id, string $nome): void{
-        $motorista = $this->buscarId($id);
-
+    public function atualizarMotorista(Motorista $motorista): void{
         if($motorista === null){
-            throw new Exception("O Motorista não foi encontrado!!!");
-        }
 
-        $motorista->atualizarNome($nome);
         $atualizar = "UPDATE motoristas 
-        SET nome = :nome, updated_at = :updated_at
+        SET nome = :nome, ativo = :ativo, 
+        updated_at = :updated_at
         WHERE id = :id";
 
         $stmt = $this->pdo->prepare($atualizar);
         $stmt->execute([
-            "nome" => $motorista->getNome(),
+            "nome"       => $motorista->getNome(),
+            "ativo"      => $motorista->getAtivo(),
             "updated_at" => $motorista->getUpdatedAt(),
-            "id"   => $motorista->getId()
-        ]);
-    }
-
-    public function inativarMotorista(int $id): void{
-        $motorista = $this->buscarId($id);
-
-        if($motorista === null){
-            throw new Exception("Motorista não encontrado!!");
-        }
-
-        $motorista->inativar();
-        $atualizar = "UPDATE motoristas
-        SET ativo = :ativo, updated_at = :updated_at
-        WHERE id = :id";
-
-        $stmt = $this->pdo->prepare($atualizar);
-        $stmt->execute([
-            "id" => $motorista->getId(),
-            "ativo" => $motorista->getAtivo(),
-            "updated_at" => $motorista->getUpdatedAt()
+            "id"         => $motorista->getId()
         ]);
     }
 
