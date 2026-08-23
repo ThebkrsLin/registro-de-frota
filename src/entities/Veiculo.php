@@ -9,6 +9,7 @@ class Veiculo{
     private int $ano;
     private string $created_at;
     private ?string $updated_at;
+    private ?int $motorista_id;
 
     public function __construct(string $placa, string $mod, string $marca, int $ano){
         $this->placa = $this->validar($placa);
@@ -19,16 +20,23 @@ class Veiculo{
         $this->created_at = date("Y-m-d H:i:ss");
         $this->ativo = true;
         $this->updated_at = null;
+        $this->motorista_id = null;
     }
 
-    public static function reconstruirVeiculo(int $id, string $placa, string $mod, string $marca, int $ano,  string $data, string $up, bool $at): Veiculo{
+    public static function reconstruirVeiculo(int $id, string $placa, string $mod, string $marca, int $ano,  string $data, ?string $up, bool $at, ?int $mid): Veiculo{
         $carro = new Veiculo($placa, $mod, $marca, $ano);
         $carro->id = $id;
         $carro->created_at = $data;
-        if($up != null){
+        $carro->ativo = $at;
+
+        if($up !== null){
             $carro->updated_at = $up;
         }
-        $carro->ativo = $at;
+
+        if($mid !== null){
+            $carro->motorista_id = $mid;
+        }
+        
         return $carro;
     }
 
@@ -46,6 +54,25 @@ class Veiculo{
         }
 
         throw new Exception("O dado digitado é inválido!!");
+    }
+
+    public function associarMotorista(int $id): void{
+        if($this->motorista_id !== null){
+            throw new Exception("Este Veiculo já possui um motorista associado");
+        }
+            
+        $this->registrarAtualizacao();
+        $this->motorista_id = $id;
+
+    }
+
+    public function desassociarMotorista(): void{
+        if($this->motorista_id === null){
+            return;
+        }
+
+        $this->motorista_id = null;
+        $this->registrarAtualizacao();
     }
 
     private function registrarAtualizacao(): void{
@@ -76,7 +103,9 @@ class Veiculo{
         if($this->ativo){
             $this->ativo = false;
         }
+
         $this->registrarAtualizacao();
+        // seria interessante fazer o index disabilitar a opção se caso o veiculo reconstruido estiver desativo?
     }
 
     /**
@@ -130,7 +159,7 @@ class Veiculo{
      * @return string
      */
 
-    public function getUpdatedAt(): string {
+    public function getUpdatedAt(): ?string {
         return $this->updated_at;
     }
 
@@ -159,5 +188,9 @@ class Veiculo{
      */
     public function getId(): ?int {
         return $this->id;
+    }
+
+    public function getMotoristaId(): ?int{
+        return $this->motorista_id;
     }
 }
