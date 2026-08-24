@@ -603,8 +603,7 @@ $veiculos = $veiculoService->listarVeiculos();
                             <td>
 
                                 <?php
-                                $motorista = $veiculoService
-                                    ->buscarMotoristaPorVeiculo(
+                                $motorista = $motoristaService->buscarMotoristaPorVeiculo(
                                         $veiculo->getId()
                                     );
                                 ?>
