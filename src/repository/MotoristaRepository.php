@@ -54,9 +54,38 @@ class MotoristaRepository{
 
     }
 
-    public function buscarMotoristaPorVeiculo(int $vid): ?Motorista{
-        return $this->mRepo->buscarMotoristaPorVeiculo($vid);
+    public function buscarMotoristaPorVeiculo(int $veiculoId): ?Motorista
+    {
+        $sql = "SELECT m.*
+                FROM motoristas m
+                INNER JOIN veiculo_motorista vm
+                    ON vm.motorista_id = m.id
+                WHERE vm.veiculo_id = :veiculo_id
+                AND vm.data_fim IS NULL";
+
+        $stmt = $this->pdo->prepare($sql);
+
+        $stmt->execute([
+            "veiculo_id" => $veiculoId
+        ]);
+
+        $res = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($res === false) {
+            return null;
+        }
+
+        return Motorista::reconstruirMotorista(
+            $res["id"],
+            $res["nome"],
+            $res["cpf"],
+            $res["ativo"],
+            $res["created_at"],
+            $res["updated_at"]
+        );
     }
+
+
 
     public function listarMotoristas(): array{
         $lista = "SELECT * FROM motoristas";
@@ -74,18 +103,43 @@ class MotoristaRepository{
         return $motoristas;
     }
 
-    public function atualizarMotorista(Motorista $motorista): void{
+    public function atualizarMotorista(int $id, string $nome): void{
+        $motorista = $this->buscarId($id);
+
+        if($motorista === null){
+            throw new Exception("O Motorista não foi encontrado!!!");
+        }
+
+        $motorista->atualizarNome($nome);
         $atualizar = "UPDATE motoristas 
-        SET nome = :nome, ativo = :ativo, 
-        updated_at = :updated_at
+        SET nome = :nome, updated_at = :updated_at
         WHERE id = :id";
 
         $stmt = $this->pdo->prepare($atualizar);
         $stmt->execute([
-            "nome"       => $motorista->getNome(),
-            "ativo"      => $motorista->getAtivo(),
+            "nome" => $motorista->getNome(),
             "updated_at" => $motorista->getUpdatedAt(),
-            "id"         => $motorista->getId()
+            "id"   => $motorista->getId()
+        ]);
+    }
+
+    public function inativarMotorista(int $id): void{
+        $motorista = $this->buscarId($id);
+
+        if($motorista === null){
+            throw new Exception("Motorista não encontrado!!");
+        }
+
+        $motorista->inativar();
+        $atualizar = "UPDATE motoristas
+        SET ativo = :ativo, updated_at = :updated_at
+        WHERE id = :id";
+
+        $stmt = $this->pdo->prepare($atualizar);
+        $stmt->execute([
+            "id" => $motorista->getId(),
+            "ativo" => $motorista->getAtivo(),
+            "updated_at" => $motorista->getUpdatedAt()
         ]);
     }
 
