@@ -83,6 +83,13 @@ class Veiculo{
 
     }
 
+    public function ativar(): void{
+        if(!$this->ativo){
+            $this->ativo = true;
+            $this->registrarAtualizacao();
+        }
+    }
+
     /**
      * Get the value of modelo
      *

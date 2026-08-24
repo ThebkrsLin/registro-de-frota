@@ -70,6 +70,13 @@ class Motorista{
 
     }
 
+    public function ativar(): void{
+        if(!$this->ativo){
+            $this->ativo = true;
+            $this->registrarAtualizacao();
+        }
+    }
+
     public function atualizarNome(string $nome): void{
         $this->nome = $this->validarNome($nome);
         $this->registrarAtualizacao();
