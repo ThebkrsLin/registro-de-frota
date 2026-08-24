@@ -9,36 +9,24 @@ class Veiculo{
     private int $ano;
     private string $created_at;
     private ?string $updated_at;
-<<<<<<< Updated upstream
-    private ?int $motorista_id;
-
-    public function __construct(string $placa, string $mod, string $marca, int $ano, ?int $mid){
-=======
 
     public function __construct(string $placa, string $mod, string $marca, int $ano){
->>>>>>> Stashed changes
+
         $this->placa = $this->validar($placa);
         $this->modelo = $this->validar($mod);
         $this->marca = $this->validar($marca);
         $this->ano = $this->validarAno($ano);
-<<<<<<< Updated upstream
         $this->created_at = date("Y-m-d H:i:ss");
-        $this->motorista_id = $mid;
-=======
         $this->created_at = date("Y-m-d H:i:s");
->>>>>>> Stashed changes
+
         $this->id = null;
         $this->ativo = true;
         $this->updated_at = null;
     }
 
-<<<<<<< Updated upstream
-    public static function reconstruirVeiculo(int $id, string $placa, string $mod, string $marca, int $ano,  string $data, ?string $up, bool $at, ?int $mid): Veiculo{
-        $carro = new Veiculo($placa, $mod, $marca, $ano, $mid);
-=======
     public static function reconstruirVeiculo(int $id, string $placa, string $mod, string $marca, int $ano,  string $data, ?string $up, bool $at): Veiculo{
         $carro = new Veiculo($placa, $mod, $marca, $ano);
->>>>>>> Stashed changes
+
         $carro->id = $id;
         $carro->created_at = $data;
         $carro->ativo = $at;
@@ -63,28 +51,6 @@ class Veiculo{
         throw new Exception("O dado digitado é inválido!!");
     }
 
-<<<<<<< Updated upstream
-    public function associarMotorista(int $id): void{
-        if($this->motorista_id !== null){
-            throw new Exception("Este Veiculo já possui um motorista associado");
-        }
-            
-        $this->registrarAtualizacao();
-        $this->motorista_id = $id;
-
-    }
-
-    public function desassociarMotorista(): void{
-        if($this->motorista_id === null){
-            return;
-        }
-
-        $this->motorista_id = null;
-        $this->registrarAtualizacao();
-    }
-
-=======
->>>>>>> Stashed changes
     private function registrarAtualizacao(): void{
         $this->updated_at = date("Y-m-d H:i:s");
     }
@@ -199,10 +165,4 @@ class Veiculo{
         return $this->id;
     }
 
-<<<<<<< Updated upstream
-    public function getMotoristaId(): ?int{
-        return $this->motorista_id;
-    }
-=======
->>>>>>> Stashed changes
 }
