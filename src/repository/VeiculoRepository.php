@@ -23,8 +23,8 @@ class VeiculoRepository{
     }
 
     public function buscarId(int $id): ?Veiculo{
-        $buscar = "SELECT * FROM veiculos WHERE id = :id";
-        $stmt = $this->pdo->prepare($buscar);
+        $sql = "SELECT * FROM veiculos WHERE id = :id";
+        $stmt = $this->pdo->prepare($sql);
         $stmt->execute([
             "id" => $id
         ]);
@@ -41,14 +41,14 @@ class VeiculoRepository{
     }
 
     public function buscarVeiculoPorMotorista(int $mid): ?Veiculo{
-        $buscar = "SELECT v.*
+        $sql = "SELECT v.*
                FROM veiculos v
                INNER JOIN veiculo_motorista vm
                    ON vm.veiculo_id = v.id
                WHERE vm.motorista_id = :motorista_id
                AND vm.data_fim IS NULL";
 
-        $stmt = $this->pdo->prepare($buscar);
+        $stmt = $this->pdo->prepare($sql);
 
         $stmt->execute([
             "motorista_id" => $mid
@@ -133,8 +133,8 @@ class VeiculoRepository{
     }
 
     public function listarVeiculos(): array{
-        $listar = "SELECT * FROM veiculos";
-        $stmt = $this->pdo->prepare($listar);
+        $sql = "SELECT * FROM veiculos";
+        $stmt = $this->pdo->prepare($sql);
         $stmt->execute();
         $res = $stmt->fetchAll(PDO::FETCH_ASSOC);
         $veiculos = [];
@@ -146,6 +146,28 @@ class VeiculoRepository{
         }
 
         return $veiculos;
+    }
+
+    public function listarHistoricosVeiculos(): array{
+        $sql = "SELECT
+                vm.id,
+                v.placa,
+                v.modelo,
+                v.marca,
+                m.nome AS motorista,
+                m.cpf,
+                vm.data_inicio,
+                vm.data_fim
+            FROM veiculo_motorista vm
+            INNER JOIN veiculos v
+                ON vm.veiculo_id = v.id
+            INNER JOIN motoristas m
+                ON vm.motorista_id = m.id
+            ORDER BY vm.data_inicio DESC";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute();
+        $res = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return $res;
     }
 
     public function criarAssociacao(int $veiculoId, int $motoristaId): void{
