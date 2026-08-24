@@ -71,8 +71,6 @@ class MotoristaRepository{
     }
 
     public function atualizarMotorista(Motorista $motorista): void{
-        if($motorista === null){
-
         $atualizar = "UPDATE motoristas 
         SET nome = :nome, ativo = :ativo, 
         updated_at = :updated_at

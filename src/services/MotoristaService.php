@@ -33,7 +33,7 @@ class MotoristaService{
         }
 
         $motorista->atualizarNome($nome);
-        $this->mRepo->atualizarMotorista($id, $motorista);
+        $this->mRepo->atualizarMotorista($motorista);
     }
 
     public function inativarMotorista(int $id): void{
@@ -44,6 +44,6 @@ class MotoristaService{
         }
 
         $motorista->inativar();
-        $this->mRepo->atualizarMotorista($id, $motorista);
+        $this->mRepo->atualizarMotorista($motorista);
     }
 }
