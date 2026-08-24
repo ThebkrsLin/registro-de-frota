@@ -87,7 +87,7 @@ class VeiculoService{
     }
 
     public function listarHistorico(): array{
-        return $this->vRepo->listarHistorico();
+        return $this->vRepo->listarHistoricosVeiculos();
     }
 
     public function inativarVeiculo(int $id): void{
