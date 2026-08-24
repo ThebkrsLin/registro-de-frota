@@ -216,12 +216,10 @@ $veiculos = $veiculoService->listarVeiculos();
         <nav>
 
             <a href="#cadastro">Cadastro</a>
-
             <a href="#motoristas">Motoristas</a>
-
             <a href="#veiculos">Veículos</a>
-
             <a href="#associacao">Associação</a>
+            <a href="historico.php">Historico</a>
 
         </nav>
 
