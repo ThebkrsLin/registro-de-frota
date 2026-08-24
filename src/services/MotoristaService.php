@@ -50,4 +50,15 @@ class MotoristaService{
         $motorista->inativar();
         $this->mRepo->atualizarMotorista($motorista);
     }
+
+    public function ativarMotorista(int $id): void{
+        $motorista = $this->mRepo->buscarId($id);
+
+        if($motorista === null){
+            throw new Exception("O motorista não foi encontrado!!!");
+        }
+
+        $motorista->ativar();
+        $this->mRepo->atualizarMotorista($motorista);
+    }
 }
