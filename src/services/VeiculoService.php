@@ -100,6 +100,17 @@ class VeiculoService{
         $this->vRepo->atualizarVeiculo($veiculo);
     }
 
+    public function ativarVeiculo(int $id): void{
+        $veiculo = $this->vRepo->buscarId($id);
+        
+        if($veiculo === null){
+            throw new Exception("Veiculo não encontrado!!!");
+        }
+
+        $veiculo->ativar();
+        $this->vRepo->atualizarVeiculo($veiculo);
+    }
+
     public function atualizarPlaca(int $id, string $placa): void{
         $veiculo = $this->vRepo->buscarId($id);
         $vPlaca = $this->vRepo->buscarPlaca($placa);
