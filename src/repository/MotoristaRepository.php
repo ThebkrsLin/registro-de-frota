@@ -8,9 +8,9 @@ class MotoristaRepository{
     }
 
     public function cadastrarMotorista(Motorista $motor): void{
-        $salvar = "INSERT INTO motoristas(nome, cpf, ativo, created_at, updated_at) VALUES(
+        $sql = "INSERT INTO motoristas(nome, cpf, ativo, created_at, updated_at) VALUES(
         :nome, :cpf, :ativo, :created_at, :updated_at)";
-        $stmt = $this->pdo->prepare($salvar);
+        $stmt = $this->pdo->prepare($sql);
         $stmt->execute([
             "nome"       => $motor->getNome(),
             "cpf"        => $motor->getCpf(),
@@ -21,8 +21,8 @@ class MotoristaRepository{
     }
 
     public function buscarId(int $id): ?Motorista{
-        $buscarid = "SELECT * FROM motoristas WHERE id = :id";
-        $stmt = $this->pdo->prepare($buscarid);
+        $sql = "SELECT * FROM motoristas WHERE id = :id";
+        $stmt = $this->pdo->prepare($sql);
         $stmt->execute([
             "id" => $id
         ]);
@@ -37,8 +37,8 @@ class MotoristaRepository{
     }
 
     public function buscarCpf(string $cpf): ?Motorista{
-        $buscarCpf = "SELECT * FROM motoristas WHERE cpf = :cpf";
-        $stmt = $this->pdo->prepare($buscarCpf);
+        $sql = "SELECT * FROM motoristas WHERE cpf = :cpf";
+        $stmt = $this->pdo->prepare($sql);
         $stmt->execute([
             "cpf" => $cpf
         ]);
@@ -88,8 +88,8 @@ class MotoristaRepository{
 
 
     public function listarMotoristas(): array{
-        $lista = "SELECT * FROM motoristas";
-        $stmt = $this->pdo->prepare($lista);
+        $sql = "SELECT * FROM motoristas";
+        $stmt = $this->pdo->prepare($sql);
         $stmt->execute();
         $res = $stmt->fetchAll(PDO::FETCH_ASSOC);
         $motoristas = [];
@@ -103,43 +103,16 @@ class MotoristaRepository{
         return $motoristas;
     }
 
-    public function atualizarMotorista(int $id, string $nome): void{
-        $motorista = $this->buscarId($id);
-
-        if($motorista === null){
-            throw new Exception("O Motorista não foi encontrado!!!");
-        }
-
-        $motorista->atualizarNome($nome);
-        $atualizar = "UPDATE motoristas 
+    public function atualizarMotorista(Motorista $motorista): void{
+        $sql = "UPDATE motoristas 
         SET nome = :nome, updated_at = :updated_at
         WHERE id = :id";
 
-        $stmt = $this->pdo->prepare($atualizar);
+        $stmt = $this->pdo->prepare($sql);
         $stmt->execute([
             "nome" => $motorista->getNome(),
             "updated_at" => $motorista->getUpdatedAt(),
             "id"   => $motorista->getId()
-        ]);
-    }
-
-    public function inativarMotorista(int $id): void{
-        $motorista = $this->buscarId($id);
-
-        if($motorista === null){
-            throw new Exception("Motorista não encontrado!!");
-        }
-
-        $motorista->inativar();
-        $atualizar = "UPDATE motoristas
-        SET ativo = :ativo, updated_at = :updated_at
-        WHERE id = :id";
-
-        $stmt = $this->pdo->prepare($atualizar);
-        $stmt->execute([
-            "id" => $motorista->getId(),
-            "ativo" => $motorista->getAtivo(),
-            "updated_at" => $motorista->getUpdatedAt()
         ]);
     }
 
