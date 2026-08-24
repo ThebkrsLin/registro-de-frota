@@ -14,45 +14,73 @@ class VeiculoService{
         $this->mRepo = new MotoristaRepository($pdo);
     }
 
-    public function cadastrarVeiculo(string $p, string $mod, string $mar, int $ano, ?int $mid): void{
-        if($mid !== null){
-            $m = $this->mRepo->buscarId($mid);
+    public function cadastrarVeiculo(string $p, string $mod, string $mar, int $ano): void{
+        $veiculoExistente = $this->vRepo->buscarPlaca($p);
 
-            if($m === null){
-                throw new Exception("Motorista não encontrado!!");
-            }
-
-            if(!$m->getAtivo()){
-                throw new Exception("O veículo não pode ser associado a um motorista inativo!!!");
-            }
+        if($veiculoExistente !== null){
+            throw new Exception("Já existe um veículo com esta placa!");
         }
         
-        $veiculo = new Veiculo($p, $mod, $mar, $ano, $mid);
+        $veiculo = new Veiculo($p, $mod, $mar, $ano);
         $this->vRepo->cadastrarVeiculo($veiculo);
     }
 
     public function associarMotorista(int $id, int $motorid): void{
+
         $v = $this->vRepo->buscarId($id);
-        $m = $this->mRepo->buscarId($motorid);
+
         if($v === null){
             throw new Exception("Veiculo não encontrado!!!");
         }
 
         if(!$v->getAtivo()){
-            throw new Exception("O Motorista não poderá ser associado a este veiculo, pois este veiculo está inativo");
+            throw new Exception("O veículo está inativo!");
         }
+
+        $m = $this->mRepo->buscarId($motorid);
 
         if($m === null){
             throw new Exception("Motorista não encontrado!!");
         }
 
         if(!$m->getAtivo()){
-            throw new Exception("O Motorista não poderá ser associado a este veiculo pois o mesmo está inativo!!");
+            throw new Exception("O motorista está inativo!");
         }
 
-        $v->associarMotorista($motorid);
-        $this->vRepo->atualizarVeiculo($v);
+        $veiculoAtual = $this->vRepo->buscarVeiculoPorMotorista($motorid);
+
+        if($veiculoAtual !== null){
+            throw new Exception("Este motorista já está associado a outro veículo!");
+        }
+        $this->vRepo->criarAssociacao($v->getId(), $motorid);
     }
+
+    public function desassociarMotorista(int $id, int $motorid): void{
+       $v = $this->vRepo->buscarId($id);
+
+        if ($v === null) {
+            throw new Exception("Veiculo não encontrado!!!");
+        }
+
+        $m = $this->mRepo->buscarId($motorid);
+
+        if ($m === null) {
+            throw new Exception("Motorista não encontrado!!");
+        }
+
+        $veiculoAtual = $this->vRepo->buscarVeiculoPorMotorista($motorid);
+
+        if ($veiculoAtual === null || $veiculoAtual->getId() !== $id) {
+            throw new Exception("Este motorista não está associado a este veículo!");
+        }
+
+        $this->vRepo->encerrarAssociacao($id, $motorid);
+    }
+
+    public function buscarVeiculoPorMotorista(int $id): ?Motorista{
+        return $this->vRepo->buscarMotoristaPorVeiculo($id);
+    }
+
 
     public function listarVeiculos(): array{
         return $this->vRepo->listarVeiculos();
@@ -70,8 +98,14 @@ class VeiculoService{
 
     public function atualizarPlaca(int $id, string $placa): void{
         $veiculo = $this->vRepo->buscarId($id);
+        $vPlaca = $this->vRepo->buscarPlaca($placa);
+
         if($veiculo === null){
             throw new Exception("Veiculo não encontrado!!!");
+        }
+
+        if($vPlaca !== null && $vPlaca->getId() !== $id){
+            throw new Exception("A placa já existe!!!");
         }
 
         $veiculo->atualizarPlaca($placa);
@@ -86,6 +120,11 @@ class VeiculoService{
 
         $veiculo->atualizarModelo($v);
         $this->vRepo->atualizarVeiculo($veiculo);
+    }
+
+    public function buscarMotoristaPorVeiculo(int $id): ?Motorista
+    {
+        return $this->vRepo->buscarMotoristaPorVeiculo($id);
     }
 
     public function atualizarMarca(int $id, string $v): void{
@@ -107,6 +146,4 @@ class VeiculoService{
         $veiculo->atualizarAno($v);
         $this->vRepo->atualizarVeiculo($veiculo);
     }
-
-
 }
