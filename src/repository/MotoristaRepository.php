@@ -85,6 +85,8 @@ class MotoristaRepository{
         );
     }
 
+
+
     public function listarMotoristas(): array{
         $lista = "SELECT * FROM motoristas";
         $stmt = $this->pdo->prepare($lista);

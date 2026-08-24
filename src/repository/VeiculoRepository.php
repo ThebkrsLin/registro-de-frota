@@ -101,37 +101,6 @@ class VeiculoRepository{
         );
     }
 
-    public function buscarMotoristaPorVeiculo(int $veiculoId): ?Motorista
-    {
-        $sql = "SELECT m.*
-                FROM motoristas m
-                INNER JOIN veiculo_motorista vm
-                    ON vm.motorista_id = m.id
-                WHERE vm.veiculo_id = :veiculo_id
-                AND vm.data_fim IS NULL";
-
-        $stmt = $this->pdo->prepare($sql);
-
-        $stmt->execute([
-            "veiculo_id" => $veiculoId
-        ]);
-
-        $res = $stmt->fetch(PDO::FETCH_ASSOC);
-
-        if ($res === false) {
-            return null;
-        }
-
-        return Motorista::reconstruirMotorista(
-            $res["id"],
-            $res["nome"],
-            $res["cpf"],
-            $res["ativo"],
-            $res["created_at"],
-            $res["updated_at"]
-        );
-    }
-
     public function listarVeiculos(): array{
         $sql = "SELECT * FROM veiculos";
         $stmt = $this->pdo->prepare($sql);
