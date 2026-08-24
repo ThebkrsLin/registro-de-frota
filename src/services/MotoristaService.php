@@ -21,6 +21,10 @@ class MotoristaService{
         $this->mRepo->cadastrarMotorista($motorista);
     }
 
+    public function buscarMotoristaPorVeiculo(int $vid): ?Motorista{
+        return $this->mRepo->buscarMotoristaPorVeiculo($vid);
+    }
+
     public function listarMotoristas(): array{
         return $this->mRepo->listarMotoristas();
     }
