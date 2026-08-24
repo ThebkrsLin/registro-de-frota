@@ -54,6 +54,10 @@ class MotoristaRepository{
 
     }
 
+    public function buscarMotoristaPorVeiculo(int $vid): ?Motorista{
+        return $this->mRepo->buscarMotoristaPorVeiculo($vid);
+    }
+
     public function listarMotoristas(): array{
         $lista = "SELECT * FROM motoristas";
         $stmt = $this->pdo->prepare($lista);
