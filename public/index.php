@@ -1,13 +1,15 @@
-```php
 <?php
 
 require_once __DIR__ . "/Connection.php";
+
 require_once __DIR__ . "/../src/services/MotoristaService.php";
+
 require_once __DIR__ . "/../src/services/VeiculoService.php";
+
 
 $connection = new Connection(
     "localhost",
-    "registro_de_frota",
+    "logistica",
     "root",
     ""
 );
@@ -19,13 +21,19 @@ $veiculoService = new VeiculoService($pdo);
 
 $mensagem = "";
 
+
 try {
 
     if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
         $acao = $_POST["acao"];
 
-        // MOTORISTA
+
+        /*
+        |--------------------------------------------------------------------------
+        | MOTORISTA
+        |--------------------------------------------------------------------------
+        */
 
         if ($acao === "cadastrar_motorista") {
 
@@ -34,8 +42,9 @@ try {
                 $_POST["cpf"]
             );
 
-            $mensagem = "Motorista cadastrado!";
+            $mensagem = "Motorista cadastrado com sucesso!";
         }
+
 
         elseif ($acao === "atualizar_motorista") {
 
@@ -44,8 +53,9 @@ try {
                 $_POST["nome"]
             );
 
-            $mensagem = "Motorista atualizado!";
+            $mensagem = "Motorista atualizado com sucesso!";
         }
+
 
         elseif ($acao === "inativar_motorista") {
 
@@ -53,28 +63,28 @@ try {
                 (int) $_POST["id"]
             );
 
-            $mensagem = "Motorista inativado!";
+            $mensagem = "Motorista inativado com sucesso!";
         }
 
 
-        // VEÍCULO
+        /*
+        |--------------------------------------------------------------------------
+        | VEÍCULO
+        |--------------------------------------------------------------------------
+        */
 
         elseif ($acao === "cadastrar_veiculo") {
-
-            $motoristaId = !empty($_POST["motorista_id"])
-                ? (int) $_POST["motorista_id"]
-                : null;
 
             $veiculoService->cadastrarVeiculo(
                 $_POST["placa"],
                 $_POST["modelo"],
                 $_POST["marca"],
-                (int) $_POST["ano"],
-                $motoristaId
+                (int) $_POST["ano"]
             );
 
-            $mensagem = "Veículo cadastrado!";
+            $mensagem = "Veículo cadastrado com sucesso!";
         }
+
 
         elseif ($acao === "atualizar_placa") {
 
@@ -83,8 +93,9 @@ try {
                 $_POST["placa"]
             );
 
-            $mensagem = "Placa atualizada!";
+            $mensagem = "Placa atualizada com sucesso!";
         }
+
 
         elseif ($acao === "atualizar_modelo") {
 
@@ -93,8 +104,9 @@ try {
                 $_POST["modelo"]
             );
 
-            $mensagem = "Modelo atualizado!";
+            $mensagem = "Modelo atualizado com sucesso!";
         }
+
 
         elseif ($acao === "atualizar_marca") {
 
@@ -103,8 +115,9 @@ try {
                 $_POST["marca"]
             );
 
-            $mensagem = "Marca atualizada!";
+            $mensagem = "Marca atualizada com sucesso!";
         }
+
 
         elseif ($acao === "atualizar_ano") {
 
@@ -113,8 +126,9 @@ try {
                 (int) $_POST["ano"]
             );
 
-            $mensagem = "Ano atualizado!";
+            $mensagem = "Ano atualizado com sucesso!";
         }
+
 
         elseif ($acao === "associar_motorista") {
 
@@ -123,8 +137,20 @@ try {
                 (int) $_POST["motorista_id"]
             );
 
-            $mensagem = "Motorista associado!";
+            $mensagem = "Motorista associado com sucesso!";
         }
+
+
+        elseif ($acao === "desassociar_motorista") {
+
+            $veiculoService->desassociarMotorista(
+                (int) $_POST["veiculo_id"],
+                (int) $_POST["motorista_id"]
+            );
+
+            $mensagem = "Motorista desassociado com sucesso!";
+        }
+
 
         elseif ($acao === "inativar_veiculo") {
 
@@ -132,7 +158,7 @@ try {
                 (int) $_POST["id"]
             );
 
-            $mensagem = "Veículo inativado!";
+            $mensagem = "Veículo inativado com sucesso!";
         }
     }
 
@@ -143,6 +169,7 @@ try {
 
 
 $motoristas = $motoristaService->listarMotoristas();
+
 $veiculos = $veiculoService->listarVeiculos();
 
 ?>
@@ -169,359 +196,822 @@ $veiculos = $veiculoService->listarVeiculos();
 
 </head>
 
+
 <body>
+
 
 <header>
 
-    <h1>Gestão de Frota</h1>
+    <div class="header-container">
 
-    <nav>
-        <a href="#motoristas">Motoristas</a>
-        <a href="#veiculos">Veículos</a>
-        <a href="#cadastro">Cadastro</a>
-    </nav>
+        <div>
+
+            <h1>Gestão de Frota</h1>
+
+            <p>Sistema de cadastro de veículos e motoristas</p>
+
+        </div>
+
+
+        <nav>
+
+            <a href="#cadastro">Cadastro</a>
+
+            <a href="#motoristas">Motoristas</a>
+
+            <a href="#veiculos">Veículos</a>
+
+            <a href="#associacao">Associação</a>
+
+        </nav>
+
+    </div>
 
 </header>
 
 
+
 <main>
+
 
     <?php if ($mensagem): ?>
 
         <div class="mensagem">
+
             <?= htmlspecialchars($mensagem) ?>
+
         </div>
 
     <?php endif; ?>
 
 
+
+    <!-- ========================================================= -->
     <!-- CADASTROS -->
+    <!-- ========================================================= -->
 
     <section id="cadastro">
 
-        <h2>Cadastrar Motorista</h2>
-
-        <form method="POST">
-
-            <input
-                type="hidden"
-                name="acao"
-                value="cadastrar_motorista"
-            >
-
-            <input
-                type="text"
-                name="nome"
-                placeholder="Nome"
-                required
-            >
-
-            <input
-                type="text"
-                name="cpf"
-                placeholder="CPF"
-                required
-            >
-
-            <button>Cadastrar</button>
-
-        </form>
+        <h2>Cadastros</h2>
 
 
-        <h2>Cadastrar Veículo</h2>
+        <div class="cards">
 
-        <form method="POST">
 
-            <input
-                type="hidden"
-                name="acao"
-                value="cadastrar_veiculo"
-            >
+            <!-- CADASTRAR MOTORISTA -->
 
-            <input
-                type="text"
-                name="placa"
-                placeholder="Placa"
-                required
-            >
+            <div class="card">
 
-            <input
-                type="text"
-                name="modelo"
-                placeholder="Modelo"
-                required
-            >
+                <h3>Cadastrar Motorista</h3>
 
-            <input
-                type="text"
-                name="marca"
-                placeholder="Marca"
-                required
-            >
+                <form method="POST">
 
-            <input
-                type="number"
-                name="ano"
-                placeholder="Ano"
-                min="2010"
-                max="<?= date("Y") ?>"
-                required
-            >
+                    <input
+                        type="hidden"
+                        name="acao"
+                        value="cadastrar_motorista"
+                    >
 
-            <select name="motorista_id">
+                    <label>Nome</label>
 
-                <option value="">
-                    Sem motorista
-                </option>
+                    <input
+                        type="text"
+                        name="nome"
+                        placeholder="Nome completo"
+                        required
+                    >
 
-                <?php foreach ($motoristas as $motorista): ?>
 
-                    <?php if ($motorista->getAtivo()): ?>
+                    <label>CPF</label>
 
-                        <option
-                            value="<?= $motorista->getId() ?>"
-                        >
-                            <?= htmlspecialchars(
-                                $motorista->getNome()
-                            ) ?>
-                        </option>
+                    <input
+                        type="text"
+                        name="cpf"
+                        placeholder="000.000.000-00"
+                        required
+                    >
 
-                    <?php endif; ?>
 
-                <?php endforeach; ?>
+                    <button type="submit">
+                        Cadastrar motorista
+                    </button>
 
-            </select>
+                </form>
 
-            <button>Cadastrar</button>
+            </div>
 
-        </form>
+
+
+            <!-- CADASTRAR VEÍCULO -->
+
+            <div class="card">
+
+                <h3>Cadastrar Veículo</h3>
+
+                <form method="POST">
+
+                    <input
+                        type="hidden"
+                        name="acao"
+                        value="cadastrar_veiculo"
+                    >
+
+
+                    <label>Placa</label>
+
+                    <input
+                        type="text"
+                        name="placa"
+                        placeholder="ABC-1234"
+                        maxlength="10"
+                        required
+                    >
+
+
+                    <label>Modelo</label>
+
+                    <input
+                        type="text"
+                        name="modelo"
+                        placeholder="Modelo do veículo"
+                        required
+                    >
+
+
+                    <label>Marca</label>
+
+                    <input
+                        type="text"
+                        name="marca"
+                        placeholder="Marca do veículo"
+                        required
+                    >
+
+
+                    <label>Ano</label>
+
+                    <input
+                        type="number"
+                        name="ano"
+                        min="2010"
+                        max="<?= date("Y") ?>"
+                        placeholder="Ano"
+                        required
+                    >
+
+
+                    <button type="submit">
+                        Cadastrar veículo
+                    </button>
+
+                </form>
+
+            </div>
+
+        </div>
 
     </section>
 
 
+
+    <!-- ========================================================= -->
     <!-- MOTORISTAS -->
+    <!-- ========================================================= -->
 
     <section id="motoristas">
 
         <h2>Motoristas</h2>
 
-        <table>
 
-            <thead>
+        <div class="table-container">
 
-                <tr>
-                    <th>ID</th>
-                    <th>Nome</th>
-                    <th>CPF</th>
-                    <th>Status</th>
-                    <th>Ação</th>
-                </tr>
+            <table>
 
-            </thead>
-
-            <tbody>
-
-                <?php foreach ($motoristas as $motorista): ?>
+                <thead>
 
                     <tr>
 
-                        <td>
-                            <?= $motorista->getId() ?>
-                        </td>
+                        <th>ID</th>
 
-                        <td>
-                            <?= htmlspecialchars(
-                                $motorista->getNome()
-                            ) ?>
-                        </td>
+                        <th>Nome</th>
 
-                        <td>
-                            <?= htmlspecialchars(
-                                $motorista->getCpf()
-                            ) ?>
-                        </td>
+                        <th>CPF</th>
 
-                        <td>
+                        <th>Status</th>
 
-                            <?= $motorista->getAtivo()
-                                ? "Ativo"
-                                : "Inativo" ?>
-
-                        </td>
-
-                        <td>
-
-                            <?php if ($motorista->getAtivo()): ?>
-
-                                <form method="POST">
-
-                                    <input
-                                        type="hidden"
-                                        name="acao"
-                                        value="inativar_motorista"
-                                    >
-
-                                    <input
-                                        type="hidden"
-                                        name="id"
-                                        value="<?= $motorista->getId() ?>"
-                                    >
-
-                                    <button>
-                                        Inativar
-                                    </button>
-
-                                </form>
-
-                            <?php endif; ?>
-
-                        </td>
+                        <th>Ações</th>
 
                     </tr>
 
-                <?php endforeach; ?>
+                </thead>
 
-            </tbody>
 
-        </table>
+                <tbody>
+
+                    <?php foreach ($motoristas as $motorista): ?>
+
+                        <tr>
+
+                            <td>
+                                <?= $motorista->getId() ?>
+                            </td>
+
+
+                            <td>
+                                <?= htmlspecialchars(
+                                    $motorista->getNome()
+                                ) ?>
+                            </td>
+
+
+                            <td>
+                                <?= htmlspecialchars(
+                                    $motorista->getCpf()
+                                ) ?>
+                            </td>
+
+
+                            <td>
+
+                                <?php if ($motorista->getAtivo()): ?>
+
+                                    <span class="status ativo">
+                                        Ativo
+                                    </span>
+
+                                <?php else: ?>
+
+                                    <span class="status inativo">
+                                        Inativo
+                                    </span>
+
+                                <?php endif; ?>
+
+                            </td>
+
+
+                            <td>
+
+                                <div class="acoes">
+
+
+                                    <!-- EDITAR NOME -->
+
+                                    <?php if ($motorista->getAtivo()): ?>
+
+                                        <form method="POST">
+
+                                            <input
+                                                type="hidden"
+                                                name="acao"
+                                                value="atualizar_motorista"
+                                            >
+
+                                            <input
+                                                type="hidden"
+                                                name="id"
+                                                value="<?= $motorista->getId() ?>"
+                                            >
+
+                                            <input
+                                                type="text"
+                                                name="nome"
+                                                value="<?= htmlspecialchars(
+                                                    $motorista->getNome()
+                                                ) ?>"
+                                                required
+                                            >
+
+                                            <button type="submit">
+                                                Editar
+                                            </button>
+
+                                        </form>
+
+
+                                        <!-- INATIVAR -->
+
+                                        <form method="POST">
+
+                                            <input
+                                                type="hidden"
+                                                name="acao"
+                                                value="inativar_motorista"
+                                            >
+
+                                            <input
+                                                type="hidden"
+                                                name="id"
+                                                value="<?= $motorista->getId() ?>"
+                                            >
+
+                                            <button
+                                                type="submit"
+                                                class="btn-danger"
+                                            >
+                                                Inativar
+                                            </button>
+
+                                        </form>
+
+                                    <?php endif; ?>
+
+
+                                </div>
+
+                            </td>
+
+                        </tr>
+
+                    <?php endforeach; ?>
+
+                </tbody>
+
+            </table>
+
+        </div>
 
     </section>
 
 
+
+    <!-- ========================================================= -->
     <!-- VEÍCULOS -->
+    <!-- ========================================================= -->
 
     <section id="veiculos">
 
         <h2>Veículos</h2>
 
-        <table>
 
-            <thead>
+        <div class="table-container">
 
-                <tr>
-                    <th>ID</th>
-                    <th>Placa</th>
-                    <th>Modelo</th>
-                    <th>Marca</th>
-                    <th>Ano</th>
-                    <th>Motorista</th>
-                    <th>Status</th>
-                    <th>Ação</th>
-                </tr>
+            <table>
 
-            </thead>
-
-            <tbody>
-
-                <?php foreach ($veiculos as $veiculo): ?>
+                <thead>
 
                     <tr>
 
-                        <td>
-                            <?= $veiculo->getId() ?>
-                        </td>
-
-                        <td>
-                            <?= htmlspecialchars(
-                                $veiculo->getPlaca()
-                            ) ?>
-                        </td>
-
-                        <td>
-                            <?= htmlspecialchars(
-                                $veiculo->getModelo()
-                            ) ?>
-                        </td>
-
-                        <td>
-                            <?= htmlspecialchars(
-                                $veiculo->getMarca()
-                            ) ?>
-                        </td>
-
-                        <td>
-                            <?= $veiculo->getAno() ?>
-                        </td>
-
-                        <td>
-
-                            <?php
-
-                            $motoristaNome = "Não associado";
-
-                            if ($veiculo->getMotoristaId() !== null) {
-
-                                foreach ($motoristas as $motorista) {
-
-                                    if (
-                                        $motorista->getId()
-                                        ===
-                                        $veiculo->getMotoristaId()
-                                    ) {
-
-                                        $motoristaNome =
-                                            $motorista->getNome();
-
-                                        break;
-                                    }
-                                }
-                            }
-
-                            ?>
-
-                            <?= htmlspecialchars($motoristaNome) ?>
-
-                        </td>
-
-                        <td>
-
-                            <?= $veiculo->getAtivo()
-                                ? "Ativo"
-                                : "Inativo" ?>
-
-                        </td>
-
-                        <td>
-
-                            <?php if ($veiculo->getAtivo()): ?>
-
-                                <form method="POST">
-
-                                    <input
-                                        type="hidden"
-                                        name="acao"
-                                        value="inativar_veiculo"
-                                    >
-
-                                    <input
-                                        type="hidden"
-                                        name="id"
-                                        value="<?= $veiculo->getId() ?>"
-                                    >
-
-                                    <button>
-                                        Inativar
-                                    </button>
-
-                                </form>
-
-                            <?php endif; ?>
-
-                        </td>
+                        <th>ID</th>
+                        <th>Placa</th>
+                        <th>Modelo</th>
+                        <th>Marca</th>
+                        <th>Ano</th>
+                        <th>Motorista</th>
+                        <th>Status</th>
+                        <th>Ações</th>
 
                     </tr>
 
-                <?php endforeach; ?>
+                </thead>
 
-            </tbody>
 
-        </table>
+                <tbody>
+
+                    <?php foreach ($veiculos as $veiculo): ?>
+
+                        <tr>
+
+                            <td>
+                                <?= $veiculo->getId() ?>
+                            </td>
+
+
+                            <td>
+                                <?= htmlspecialchars(
+                                    $veiculo->getPlaca()
+                                ) ?>
+                            </td>
+
+
+                            <td>
+                                <?= htmlspecialchars(
+                                    $veiculo->getModelo()
+                                ) ?>
+                            </td>
+
+
+                            <td>
+                                <?= htmlspecialchars(
+                                    $veiculo->getMarca()
+                                ) ?>
+                            </td>
+
+
+                            <td>
+                                <?= $veiculo->getAno() ?>
+                            </td>
+
+                            <td>
+
+                                <?php
+                                $motorista = $veiculoService
+                                    ->buscarMotoristaPorVeiculo(
+                                        $veiculo->getId()
+                                    );
+                                ?>
+
+                                <?php if ($motorista !== null): ?>
+
+                                    <?= htmlspecialchars(
+                                        $motorista->getNome()
+                                    ) ?>
+
+                                <?php else: ?>
+
+                                    <span class="nao-associado">
+                                        Não associado
+                                    </span>
+
+                                <?php endif; ?>
+
+                            </td>
+
+
+                            <td>
+
+                                <?php if ($veiculo->getAtivo()): ?>
+
+                                    <span class="status ativo">
+                                        Ativo
+                                    </span>
+
+                                <?php else: ?>
+
+                                    <span class="status inativo">
+                                        Inativo
+                                    </span>
+
+                                <?php endif; ?>
+
+                            </td>
+
+
+                            <td>
+
+                                <div class="acoes">
+
+
+                                    <?php if ($veiculo->getAtivo()): ?>
+
+
+                                        <!-- ALTERAR PLACA -->
+
+                                        <form method="POST">
+
+                                            <input
+                                                type="hidden"
+                                                name="acao"
+                                                value="atualizar_placa"
+                                            >
+
+                                            <input
+                                                type="hidden"
+                                                name="id"
+                                                value="<?= $veiculo->getId() ?>"
+                                            >
+
+                                            <input
+                                                type="text"
+                                                name="placa"
+                                                value="<?= htmlspecialchars(
+                                                    $veiculo->getPlaca()
+                                                ) ?>"
+                                                required
+                                            >
+
+                                            <button type="submit">
+                                                Alterar placa
+                                            </button>
+
+                                        </form>
+
+
+
+                                        <!-- ALTERAR MODELO -->
+
+                                        <form method="POST">
+
+                                            <input
+                                                type="hidden"
+                                                name="acao"
+                                                value="atualizar_modelo"
+                                            >
+
+                                            <input
+                                                type="hidden"
+                                                name="id"
+                                                value="<?= $veiculo->getId() ?>"
+                                            >
+
+                                            <input
+                                                type="text"
+                                                name="modelo"
+                                                value="<?= htmlspecialchars(
+                                                    $veiculo->getModelo()
+                                                ) ?>"
+                                                required
+                                            >
+
+                                            <button type="submit">
+                                                Alterar modelo
+                                            </button>
+
+                                        </form>
+
+
+
+                                        <!-- ALTERAR MARCA -->
+
+                                        <form method="POST">
+
+                                            <input
+                                                type="hidden"
+                                                name="acao"
+                                                value="atualizar_marca"
+                                            >
+
+                                            <input
+                                                type="hidden"
+                                                name="id"
+                                                value="<?= $veiculo->getId() ?>"
+                                            >
+
+                                            <input
+                                                type="text"
+                                                name="marca"
+                                                value="<?= htmlspecialchars(
+                                                    $veiculo->getMarca()
+                                                ) ?>"
+                                                required
+                                            >
+
+                                            <button type="submit">
+                                                Alterar marca
+                                            </button>
+
+                                        </form>
+
+
+
+                                        <!-- ALTERAR ANO -->
+
+                                        <form method="POST">
+
+                                            <input
+                                                type="hidden"
+                                                name="acao"
+                                                value="atualizar_ano"
+                                            >
+
+                                            <input
+                                                type="hidden"
+                                                name="id"
+                                                value="<?= $veiculo->getId() ?>"
+                                            >
+
+                                            <input
+                                                type="number"
+                                                name="ano"
+                                                value="<?= $veiculo->getAno() ?>"
+                                                min="2010"
+                                                max="<?= date("Y") ?>"
+                                                required
+                                            >
+
+                                            <button type="submit">
+                                                Alterar ano
+                                            </button>
+
+                                        </form>
+
+
+
+                                        <!-- INATIVAR -->
+
+                                        <form method="POST">
+
+                                            <input
+                                                type="hidden"
+                                                name="acao"
+                                                value="inativar_veiculo"
+                                            >
+
+                                            <input
+                                                type="hidden"
+                                                name="id"
+                                                value="<?= $veiculo->getId() ?>"
+                                            >
+
+                                            <button
+                                                type="submit"
+                                                class="btn-danger"
+                                            >
+                                                Inativar
+                                            </button>
+
+                                        </form>
+
+                                    <?php endif; ?>
+
+
+                                </div>
+
+                            </td>
+
+                        </tr>
+
+                    <?php endforeach; ?>
+
+                </tbody>
+
+            </table>
+
+        </div>
 
     </section>
 
+
+
+    <!-- ========================================================= -->
+    <!-- ASSOCIAÇÃO -->
+    <!-- ========================================================= -->
+
+    <section id="associacao">
+
+        <h2>Associação de Motoristas</h2>
+
+
+        <div class="cards">
+
+
+            <!-- ASSOCIAR -->
+
+            <div class="card">
+
+                <h3>Associar motorista a veículo</h3>
+
+                <form method="POST">
+
+                    <input
+                        type="hidden"
+                        name="acao"
+                        value="associar_motorista"
+                    >
+
+
+                    <label>Veículo</label>
+
+                    <select
+                        name="veiculo_id"
+                        required
+                    >
+
+                        <option value="">
+                            Selecione um veículo
+                        </option>
+
+
+                        <?php foreach ($veiculos as $veiculo): ?>
+
+                            <?php if ($veiculo->getAtivo()): ?>
+
+                                <option
+                                    value="<?= $veiculo->getId() ?>"
+                                >
+
+                                    <?= htmlspecialchars(
+                                        $veiculo->getPlaca()
+                                    ) ?>
+
+                                    -
+                                    
+                                    <?= htmlspecialchars(
+                                        $veiculo->getModelo()
+                                    ) ?>
+
+                                </option>
+
+                            <?php endif; ?>
+
+                        <?php endforeach; ?>
+
+                    </select>
+
+
+
+                    <label>Motorista</label>
+
+                    <select
+                        name="motorista_id"
+                        required
+                    >
+
+                        <option value="">
+                            Selecione um motorista
+                        </option>
+
+
+                        <?php foreach ($motoristas as $motorista): ?>
+
+                            <?php if ($motorista->getAtivo()): ?>
+
+                                <option
+                                    value="<?= $motorista->getId() ?>"
+                                >
+
+                                    <?= htmlspecialchars(
+                                        $motorista->getNome()
+                                    ) ?>
+
+                                </option>
+
+                            <?php endif; ?>
+
+                        <?php endforeach; ?>
+
+                    </select>
+
+
+                    <button type="submit">
+                        Associar motorista
+                    </button>
+
+                </form>
+
+            </div>
+
+
+
+            <!-- DESASSOCIAR -->
+
+            <div class="card">
+
+                <h3>Desassociar motorista</h3>
+
+                <p class="descricao">
+                    Informe o ID do veículo e do motorista
+                    para encerrar a associação atual.
+                </p>
+
+
+                <form method="POST">
+
+                    <input
+                        type="hidden"
+                        name="acao"
+                        value="desassociar_motorista"
+                    >
+
+
+                    <label>ID do veículo</label>
+
+                    <input
+                        type="number"
+                        name="veiculo_id"
+                        min="1"
+                        required
+                    >
+
+
+                    <label>ID do motorista</label>
+
+                    <input
+                        type="number"
+                        name="motorista_id"
+                        min="1"
+                        required
+                    >
+
+
+                    <button
+                        type="submit"
+                        class="btn-danger"
+                    >
+                        Desassociar
+                    </button>
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
 </main>
+
+
+<footer>
+
+    <p>
+        Sistema de Gestão de Frota — PHP + POO + PDO
+    </p>
+
+</footer>
+
 
 </body>
 
 </html>
-```
