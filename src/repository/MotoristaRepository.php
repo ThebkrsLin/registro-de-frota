@@ -105,14 +105,16 @@ class MotoristaRepository{
 
     public function atualizarMotorista(Motorista $motorista): void{
         $sql = "UPDATE motoristas 
-        SET nome = :nome, updated_at = :updated_at
+        SET nome = :nome, updated_at = :updated_at,
+        ativo = :ativo
         WHERE id = :id";
 
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([
             "nome" => $motorista->getNome(),
             "updated_at" => $motorista->getUpdatedAt(),
-            "id"   => $motorista->getId()
+            "id"   => $motorista->getId(),
+            "ativo" => $motorista->getAtivo()
         ]);
     }
 
