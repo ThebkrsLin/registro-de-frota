@@ -66,6 +66,14 @@ try {
             $mensagem = "Motorista inativado com sucesso!";
         }
 
+        elseif($acao === "ativar_motorista"){
+            $motoristaService->ativarMotorista(
+                (int) $_POST["id"]
+            );
+
+            $mensagem = "Motorista Ativado com sucesso!";
+        }
+
 
         /*
         |--------------------------------------------------------------------------
@@ -159,6 +167,14 @@ try {
             );
 
             $mensagem = "Veículo inativado com sucesso!";
+        }
+
+        elseif($acao === "ativar_veiculo"){
+            $veiculoService->ativarVeiculo(
+                (int) $_POST["id"]
+            );
+
+            $mensagem = "Veiculo ativado com sucesso!";
         }
     }
 
@@ -512,6 +528,30 @@ $veiculos = $veiculoService->listarVeiculos();
 
                                         </form>
 
+                                    <?php elseif(!$motorista->getAtivo()):?>
+                                        <form method="POST">
+
+                                            <input
+                                                type="hidden"
+                                                name="acao"
+                                                value="ativar_motorista"
+                                            >
+
+                                            <input
+                                                type="hidden"
+                                                name="id"
+                                                value="<?= $motorista->getId() ?>"
+                                            >
+
+                                            <button
+                                                type="submit"
+                                                class="btn-green"
+                                            >
+                                                ativar
+                                            </button>
+
+                                        </form>
+
                                     <?php endif; ?>
 
 
@@ -805,6 +845,30 @@ $veiculos = $veiculoService->listarVeiculos();
                                                 class="btn-danger"
                                             >
                                                 Inativar
+                                            </button>
+
+                                        </form>
+                                    
+                                    <?php elseif(!$veiculo->getAtivo()):?>
+                                        <form method="POST">
+
+                                            <input
+                                                type="hidden"
+                                                name="acao"
+                                                value="ativar_veiculo"
+                                            >
+
+                                            <input
+                                                type="hidden"
+                                                name="id"
+                                                value="<?= $veiculo->getId() ?>"
+                                            >
+
+                                            <button
+                                                type="submit"
+                                                class="btn-green"
+                                            >
+                                                ativar
                                             </button>
 
                                         </form>
